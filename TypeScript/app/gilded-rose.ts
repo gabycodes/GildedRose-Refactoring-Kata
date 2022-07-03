@@ -18,51 +18,54 @@ export class GildedRose {
   }
 
   updateQuality() {
-    for (let i = 0; i < this.items.length; i++) {
-      if (this.items[i].name != 'Aged Brie' && this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-        if (this.items[i].quality > 0) {
-          if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-            this.items[i].quality = this.items[i].quality - 1
-          }
-        }
-      } else {
-        if (this.items[i].quality < 50) {
-          this.items[i].quality = this.items[i].quality + 1
-          if (this.items[i].name == 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].sellIn < 11) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-            if (this.items[i].sellIn < 6) {
-              if (this.items[i].quality < 50) {
-                this.items[i].quality = this.items[i].quality + 1
-              }
-            }
-          }
-        }
-      }
-      if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-        this.items[i].sellIn = this.items[i].sellIn - 1;
-      }
-      if (this.items[i].sellIn < 0) {
-        if (this.items[i].name != 'Aged Brie') {
-          if (this.items[i].name != 'Backstage passes to a TAFKAL80ETC concert') {
-            if (this.items[i].quality > 0) {
-              if (this.items[i].name != 'Sulfuras, Hand of Ragnaros') {
-                this.items[i].quality = this.items[i].quality - 1
-              }
-            }
-          } else {
-            this.items[i].quality = this.items[i].quality - this.items[i].quality
-          }
+    this.items.map((item) => {
+      const { name } = item;
+
+      const ageOneDay = () => (item.sellIn = item.sellIn - 1);
+
+      const increaseOrDecreaseQuality = (number) => {
+        const updatedQuality = item.quality + number;
+        if (updatedQuality < 1) {
+          return (item.quality = 0);
+        } else if (item.quality > 50) {
+          return (item.quality = 50);
         } else {
-          if (this.items[i].quality < 50) {
-            this.items[i].quality = this.items[i].quality + 1
-          }
+          return (item.quality = updatedQuality);
         }
+      };
+
+      switch (name) {
+        case "Aged Brie":
+          increaseOrDecreaseQuality(+1);
+          ageOneDay();
+          break;
+
+        case "Backstage passes to a TAFKAL80ETC concert":
+          if (item.sellIn < 1) {
+            increaseOrDecreaseQuality(-item.quality);
+          } else if (item.sellIn <= 5) {
+            increaseOrDecreaseQuality(+3);
+          } else if (item.sellIn <= 10) {
+            increaseOrDecreaseQuality(+2);
+          } else {
+            increaseOrDecreaseQuality(+1);
+          }
+
+          ageOneDay();
+          break;
+
+        case "Sulfuras, Hand of Ragnaros":
+          break;
+
+        default:
+          item.sellIn < 1
+            ? increaseOrDecreaseQuality(-2)
+            : increaseOrDecreaseQuality(-1);
+          ageOneDay();
+
+          break;
       }
-    }
+    });
 
     return this.items;
   }
